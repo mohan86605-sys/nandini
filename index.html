@@ -1,0 +1,2979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nandini Bills</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f2f5f8;
+    color:#222;
+}
+
+header{
+    background:#0b5ed7;
+    color:white;
+    padding:15px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+header h1{
+    margin:0;
+    font-size:23px;
+}
+
+header span{
+    font-size:14px;
+}
+
+.container{
+    padding:18px;
+    max-width:1600px;
+    margin:auto;
+}
+
+.menu{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.menu button{
+    border:0;
+    background:white;
+    padding:18px;
+    border-radius:10px;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 2px 8px #0002;
+}
+
+.menu button:hover{
+    background:#eaf2ff;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+.card{
+    background:white;
+    border-radius:12px;
+    padding:18px;
+    box-shadow:0 2px 8px #0002;
+    margin-bottom:18px;
+}
+
+.card h2{
+    margin-top:0;
+}
+
+.controls{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:end;
+}
+
+.field{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+label{
+    font-weight:bold;
+    font-size:14px;
+}
+
+input,select{
+    padding:10px;
+    border:1px solid #bbb;
+    border-radius:6px;
+    font-size:15px;
+}
+
+button{
+    cursor:pointer;
+}
+
+.btn{
+    border:0;
+    border-radius:6px;
+    padding:10px 16px;
+    font-size:15px;
+    font-weight:bold;
+}
+
+.primary{
+    background:#0b5ed7;
+    color:white;
+}
+
+.success{
+    background:#198754;
+    color:white;
+}
+
+.warning{
+    background:#ffc107;
+    color:#222;
+}
+
+.danger{
+    background:#dc3545;
+    color:white;
+}
+
+.secondary{
+    background:#6c757d;
+    color:white;
+}
+
+.info{
+    background:#0dcaf0;
+    color:#111;
+}
+
+.table-wrap{
+    width:100%;
+    overflow:auto;
+    border:1px solid #ddd;
+    border-radius:8px;
+}
+
+table{
+    border-collapse:collapse;
+    width:max-content;
+    min-width:100%;
+}
+
+th,td{
+    border:1px solid #ccc;
+    padding:8px;
+    text-align:center;
+    white-space:nowrap;
+}
+
+th{
+    background:#e9f2ff;
+}
+
+.product-header{
+    background:#d8eaff;
+    font-weight:bold;
+}
+
+.rate-row{
+    background:#fff7d6;
+}
+
+.quantity-input{
+    width:80px;
+    text-align:center;
+    font-size:17px;
+}
+
+.total-cell{
+    font-weight:bold;
+    background:#e8f7ee;
+}
+
+.total-box{
+    font-size:20px;
+    font-weight:bold;
+    padding:12px;
+    background:#e8f7ee;
+    border-radius:8px;
+    display:inline-block;
+}
+
+.rate-input{
+    width:90px;
+    text-align:center;
+}
+.small-input{width:78px;text-align:center;}
+.asd-box{margin-top:16px;padding:14px;background:#fff7d6;border:1px solid #e6cf70;border-radius:8px;font-weight:bold;font-size:17px;}
+
+.name-input{
+    width:190px;
+}
+
+.product-form{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:end;
+}
+
+.dashboard-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+}
+
+.dashboard-box{
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 2px 8px #0002;
+}
+
+.dashboard-box h3{
+    margin:0 0 10px;
+    color:#555;
+}
+
+.dashboard-box .number{
+    font-size:28px;
+    font-weight:bold;
+}
+
+.status{
+    margin-top:10px;
+    font-size:13px;
+    color:#555;
+}
+
+.preview{
+    background:white;
+    border:2px solid #333;
+    padding:20px;
+    margin-top:20px;
+    display:none;
+}
+
+.preview h2{
+    text-align:center;
+}
+
+.preview table{
+    width:100%;
+    min-width:0;
+}
+
+@media(max-width:900px){
+    .menu{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .dashboard-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:600px){
+    .menu{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .dashboard-grid{
+        grid-template-columns:1fr;
+    }
+
+    .container{
+        padding:10px;
+    }
+}
+
+@media print{
+    body *{
+        visibility:hidden;
+    }
+
+    #printArea,
+    #printArea *{
+        visibility:visible;
+    }
+
+    #printArea{
+        position:absolute;
+        left:0;
+        top:0;
+        width:100%;
+    }
+
+    .no-print{
+        display:none!important;
+    }
+
+    table{
+        width:100%;
+        font-size:11px;
+    }
+
+    th,td{
+        padding:4px;
+    }
+}
+
+.history-actions { min-width: 190px; }
+.history-actions .btn { margin: 2px; padding: 6px 9px; font-size: 12px; }
+.btn.danger { background: #b91c1c; color: #fff; border: 0; }
+@media print { .no-print { display: none !important; } }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🥛 Nandini Bills</h1>
+    <span id="connectionStatus">Checking connection...</span>
+</header>
+
+<div class="container">
+
+    <!-- MENU -->
+    <div class="menu no-print">
+        <button onclick="showPage('dashboard')">📊 Dashboard</button>
+        <button onclick="showPage('billing')">🧾 Start Billing</button>
+        <button onclick="showPage('rates')">💰 Rates</button>
+        <button onclick="showPage('history')">📚 Bill History</button>
+    </div>
+
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="page active">
+
+        <div class="card">
+            <h2>Dashboard</h2>
+
+            <div class="controls no-print">
+                <div class="field">
+                    <label>Date</label>
+                    <input type="date" id="dashboardDate">
+                </div>
+
+                <button class="btn primary" onclick="loadDashboard()">
+                    View Summary
+                </button>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+
+            <div class="dashboard-box">
+                <h3>Morning Quantity</h3>
+                <div class="number" id="dashMorningQty">0</div>
+            </div>
+
+            <div class="dashboard-box">
+                <h3>Morning Amount</h3>
+                <div class="number" id="dashMorningAmount">₹0</div>
+            </div>
+
+            <div class="dashboard-box">
+                <h3>Afternoon Quantity</h3>
+                <div class="number" id="dashAfternoonQty">0</div>
+            </div>
+
+            <div class="dashboard-box">
+                <h3>Afternoon Amount</h3>
+                <div class="number" id="dashAfternoonAmount">₹0</div>
+            </div>
+
+            <div class="dashboard-box">
+                <h3>Total Amount</h3>
+                <div class="number" id="dashCombinedAmount">₹0</div>
+            </div>
+            <div class="dashboard-box">
+                <h3>Daily ASD</h3>
+                <div class="number" id="dashDailyASD">₹0.00</div>
+            </div>
+            <div class="dashboard-box">
+                <h3>Monthly ASD</h3>
+                <div class="number" id="dashMonthlyASD">₹0.00</div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- START BILLING -->
+    <section id="billing" class="page">
+
+        <div class="card no-print">
+
+            <h2>Start Billing</h2>
+
+            <div class="controls">
+
+                <div class="field">
+                    <label>Date</label>
+                    <input type="date" id="billingDate">
+                </div>
+
+                <div class="field">
+                    <label>Session</label>
+                    <select id="billingSession">
+                        <option value="Morning">Morning</option>
+                        <option value="Afternoon">Afternoon</option>
+                    </select>
+                </div>
+
+                <button class="btn primary" onclick="loadBilling()">
+                    Load
+                </button>
+
+                <button class="btn success" onclick="saveBilling()">
+                    Save Bill
+                </button>
+
+                <button class="btn info" onclick="previewBilling()">
+                    Preview
+                </button>
+
+                <button class="btn secondary" onclick="clearBilling()">
+                    Clear
+                </button>
+
+            </div>
+
+            <div class="status" id="billingStatus"></div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Milk Quantity Entry</h2>
+
+            <div class="table-wrap">
+
+                <table id="billingTable">
+
+                    <thead>
+                        <tr id="billingProductHeader">
+                            <th>Type</th>
+                        </tr>
+
+                        <tr id="billingRateHeader">
+                            <th>Rate</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr id="billingQuantityRow">
+                            <td><b>Quantity</b></td>
+                        </tr>
+                    </tbody>
+
+                    <tfoot>
+                        <tr id="billingAmountRow">
+                            <th>Total Amount</th>
+                        </tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <br>
+
+            <div class="total-box">
+                Total Amount:
+                <span id="billingGrandTotal">₹0.00</span>
+            </div>
+
+        </div>
+
+
+        <!-- PREVIEW -->
+        <div class="preview" id="billingPreview">
+
+            <h2>Nandini Billing Preview</h2>
+
+            <div id="previewDetails"></div>
+
+            <br>
+
+            <div class="no-print">
+                <button class="btn primary" onclick="printBillingPreview()">
+                    Print
+                </button>
+
+                <button class="btn secondary" onclick="closePreview()">
+                    Close
+                </button>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- RATES -->
+    <section id="rates" class="page">
+
+        <div class="card">
+
+            <h2>Nandini Products & Rates</h2>
+
+            <p>
+                Change the rate whenever required. New rates affect only
+                newly saved bills. Previous bills keep their original rate.
+            </p>
+
+            <div class="asd-box">
+                Daily ASD = ₹0.05 × total billing quantity entered in Start Billing for the selected date.
+                <span style="float:right" id="dailyASDValue">₹0.00</span>
+            </div>
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Sl.No</th>
+                            <th>Product Name</th>
+                            <th>Rate ₹</th>
+                            <th>QTY</th>
+                            <th>GST</th>
+                            <th>Final Rate ₹</th>
+                            <th>GST per Unit ₹</th>
+                            <th>Rate + GST ₹</th>
+                            <th class="no-print">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="ratesTableBody"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <div class="card no-print">
+
+            <h2>Add New Nandini Product</h2>
+
+            <div class="product-form">
+
+                <div class="field">
+                    <label>Product Name</label>
+                    <input
+                        type="text"
+                        id="newProductName"
+                        placeholder="Enter product name">
+                </div>
+
+                <div class="field">
+                    <label>Rate ₹</label>
+                    <input
+                        type="number"
+                        id="newProductRate"
+                        placeholder="Enter rate"
+                        min="0"
+                        step="0.01">
+                </div>
+
+                <button class="btn success" onclick="addProduct()">
+                    + Add Product
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- BILL HISTORY -->
+    <section id="history" class="page">
+
+        <div class="card no-print">
+
+            <h2>Bill History</h2>
+
+            <div class="controls">
+
+                <div class="field">
+                    <label>Month & Year</label>
+                    <input type="month" id="historyMonth">
+                </div>
+
+                <div class="field">
+                    <label>Date</label>
+                    <input type="date" id="historyDate">
+                </div>
+
+                <div class="field">
+                    <label>Session</label>
+                    <select id="historySession">
+                        <option value="Combined">Combined</option>
+                        <option value="Morning">Morning</option>
+                        <option value="Afternoon">Afternoon</option>
+                    </select>
+                </div>
+
+                <button class="btn primary" onclick="showHistory()">
+                    View
+                </button>
+
+                <button class="btn warning" onclick="printHistory()">
+                    Print
+                </button>
+
+            </div>
+
+            <p>
+                If Date is selected, the selected day's bill is shown.
+                If Date is empty, the selected Month & Year is shown.
+            </p>
+
+        </div>
+
+
+        <div class="card" id="printArea">
+
+            <h2 id="historyTitle">Bill History</h2>
+
+            <div class="table-wrap">
+
+                <table id="historyTable">
+
+                    <thead>
+                        <tr id="historyHeader">
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="historyBody"></tbody>
+
+                    <tfoot>
+                        <tr id="historyFooter"></tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <br>
+
+            <div class="total-box">
+                History Total:
+                <span id="historyGrandTotal">₹0.00</span>
+            </div>
+            <div class="asd-box" id="monthlyASDBox">
+                Monthly ASD: <span id="historyMonthlyASD">₹0.00</span>
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   SUPABASE SETTINGS
+   ========================================================= */
+
+const SUPABASE_URL = "https://grgrsxslqilvvkmuakoa.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_S-COSgMlff1GU_k_I6B4Hw_gE-jK000";
+
+let supabaseClient = null;
+
+if (
+    SUPABASE_URL !== "YOUR_SUPABASE_URL" &&
+    SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY"
+) {
+    supabaseClient =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY
+        );
+}
+
+
+/* =========================================================
+   DEFAULT NANDINI PRODUCTS
+   ========================================================= */
+
+const DEFAULT_PRODUCTS = [
+
+    {
+        name:"Blue Milk 500 ml",
+        rate:24
+    },
+
+    {
+        name:"Blue Milk 1 L",
+        rate:48
+    },
+
+    {
+        name:"Green Milk 500 ml",
+        rate:26
+    },
+
+    {
+        name:"Orange Milk 500 ml",
+        rate:28
+    },
+
+    {
+        name:"Orange Milk 1 L",
+        rate:52
+    },
+
+    {
+        name:"NSM",
+        rate:52
+    },
+
+    {
+        name:"NSM 250 ml",
+        rate:65
+    },
+
+    {
+        name:"Samrudhi",
+        rate:56
+    },
+
+    {
+        name:"Curd 250 ml",
+        rate:65
+    },
+
+    {
+        name:"Curd 500 ml",
+        rate:56
+    }
+
+];
+
+
+let products = [];
+let bills = [];
+let editingBillOriginalItems = null;
+
+
+/* =========================================================
+   PAGE NAVIGATION
+   ========================================================= */
+
+function showPage(page){
+
+    document
+        .querySelectorAll(".page")
+        .forEach(p => p.classList.remove("active"));
+
+    document
+        .getElementById(page)
+        .classList.add("active");
+
+    if(page === "rates"){
+        renderRates();
+    }
+
+    if(page === "billing"){
+        renderBillingTable();
+    }
+
+    if(page === "history"){
+        showHistory();
+    }
+
+    if(page === "dashboard"){
+        loadDashboard();
+    }
+
+}
+
+
+/* =========================================================
+   DATE HELPERS
+   ========================================================= */
+
+function today(){
+
+    const d = new Date();
+
+    const year = d.getFullYear();
+
+    const month =
+        String(d.getMonth()+1).padStart(2,"0");
+
+    const day =
+        String(d.getDate()).padStart(2,"0");
+
+    return `${year}-${month}-${day}`;
+
+}
+
+
+function currentMonth(){
+
+    return today().substring(0,7);
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+async function initialize(){
+
+    document.getElementById("billingDate").value = today();
+
+    document.getElementById("dashboardDate").value = today();
+
+    document.getElementById("historyMonth").value =
+        currentMonth();
+
+    await loadProducts();
+
+    await loadBills();
+
+    renderRates();
+
+    renderBillingTable();
+
+    loadDashboard();
+
+    setConnectionStatus();
+
+}
+
+
+function setConnectionStatus(){
+
+    const el =
+        document.getElementById("connectionStatus");
+
+    if(supabaseClient){
+
+        el.textContent =
+            "☁ Online Database";
+
+    }else{
+
+        el.textContent =
+            "💻 Local Demo Mode";
+
+    }
+
+}
+
+
+/* =========================================================
+   PRODUCT STORAGE
+   ========================================================= */
+
+async function loadProducts(){
+
+    if(!supabaseClient){
+
+        const saved =
+            localStorage.getItem("nandini_products");
+
+        if(saved){
+
+            products = JSON.parse(saved).map(normalizeProduct);
+
+        }else{
+
+            products =
+                DEFAULT_PRODUCTS.map((p,index)=>({
+
+                    id:String(index+1),
+
+                    name:p.name,
+                    rate:p.rate,
+                    qty:1,
+                    gst:false
+                }));
+
+            localStorage.setItem(
+                "nandini_products",
+                JSON.stringify(products)
+            );
+
+        }
+
+        return;
+    }
+
+
+    const {data,error} =
+        await supabaseClient
+            .from("products")
+            .select("*")
+            .order("created_at",{ascending:true});
+
+
+    if(error){
+
+        console.error(error);
+
+        return;
+
+    }
+
+
+    if(!data || data.length === 0){
+
+        for(const p of DEFAULT_PRODUCTS){
+
+            await supabaseClient
+                .from("products")
+                .insert({
+
+                    name:p.name,
+                    rate:p.rate,
+                    qty:1,
+                    gst:false
+                });
+
+        }
+
+        const result =
+            await supabaseClient
+                .from("products")
+                .select("*")
+                .order("created_at",{ascending:true});
+
+        products =
+            result.data || [];
+
+    }else{
+
+        products = (data || []).map(normalizeProduct);
+
+    }
+
+}
+
+
+function normalizeProduct(product){
+    return {...product, qty:Number(product.qty ?? 1),
+        gst:product.gst === true || product.gst === "true" || product.gst === 1};
+}
+function productFinalRate(product){ return Number(product.rate || 0) * Number(product.qty ?? 1); }
+function productGSTPerUnit(product){ return product.gst ? productFinalRate(product) * 0.05 : 0; }
+function productRateWithGST(product){ return productFinalRate(product) + productGSTPerUnit(product); }
+function itemAmount(item){
+    if(!item || typeof item !== "object") return 0;
+    return (Number(item.quantity)||0) *
+        (Number(item.finalRate ?? item.rate ?? 0) + Number(item.gstPerUnit ?? 0));
+}
+function billQuantityTotal(bill){
+    const items = bill?.items || bill?.quantities || {};
+    return Object.values(items).reduce((sum, item) => {
+        if(item && typeof item === "object") return sum + (Number(item.quantity) || 0);
+        return sum + (Number(item) || 0);
+    }, 0);
+}
+
+// ASD is calculated from the actual quantities entered in Start Billing.
+// Morning and Afternoon bills are both included; each saved bill is counted once.
+function dailyASD(date){
+    const selectedDate = date || document.getElementById("billingDate")?.value || today();
+    return 0.05 * bills
+        .filter(b => b.bill_date === selectedDate)
+        .reduce((sum, bill) => sum + billQuantityTotal(bill), 0);
+}
+function monthlyASD(month){
+    return 0.05 * bills
+        .filter(b => String(b.bill_date || "").startsWith(month))
+        .reduce((sum, bill) => sum + billQuantityTotal(bill), 0);
+}
+
+/* =========================================================
+   SAVE LOCAL PRODUCTS
+   ========================================================= */
+
+function saveLocalProducts(){
+
+    localStorage.setItem(
+        "nandini_products",
+        JSON.stringify(products)
+    );
+
+}
+
+
+/* =========================================================
+   RATES PAGE
+   ========================================================= */
+
+function renderRates(){
+    const body=document.getElementById("ratesTableBody");
+    body.innerHTML="";
+    products.forEach((raw,index)=>{
+        const p=normalizeProduct(raw); products[index]=p;
+        const tr=document.createElement("tr");
+        tr.innerHTML=`
+        <td>${index+1}</td>
+        <td><input class="name-input" value="${escapeHTML(p.name)}" onchange="changeProductName('${p.id}',this.value)"></td>
+        <td><input class="rate-input" type="number" min="0" step="0.01" value="${Number(p.rate)}" onchange="changeRate('${p.id}',this.value)"></td>
+        <td><input class="small-input" type="number" min="0" step="0.01" value="${p.qty}" onchange="changeProductQty('${p.id}',this.value)"></td>
+        <td><select class="small-input" onchange="changeProductGST('${p.id}',this.value)">
+          <option value="false" ${!p.gst?'selected':''}>No</option><option value="true" ${p.gst?'selected':''}>Yes</option></select></td>
+        <td>₹${productFinalRate(p).toFixed(2)}</td><td>₹${productGSTPerUnit(p).toFixed(2)}</td>
+        <td>₹${productRateWithGST(p).toFixed(2)}</td>
+        <td class="no-print"><button class="btn danger" onclick="deleteProduct('${p.id}')">Delete</button></td>`;
+        body.appendChild(tr);
+    });
+    const el=document.getElementById("dailyASDValue");
+    const billingDate=document.getElementById("billingDate")?.value || today();
+    if(el) el.textContent="₹"+dailyASD(billingDate).toFixed(2);
+}
+async function saveProductField(id,fields){
+    const p=products.find(x=>String(x.id)===String(id)); if(!p)return;
+    Object.assign(p,fields);
+    if(supabaseClient){
+        const {error}=await supabaseClient.from("products").update(fields).eq("id",id);
+        if(error){alert(error.message);return;}
+    }else saveLocalProducts();
+    renderRates(); renderBillingTable(); loadDashboard();
+}
+async function changeProductQty(id,value){
+    const qty=Number(value);
+    if(!Number.isFinite(qty)||qty<0){alert("Enter a valid QTY (0 or greater).");renderRates();return;}
+    await saveProductField(id,{qty});
+}
+async function changeProductGST(id,value){ await saveProductField(id,{gst:value==="true"}); }
+
+/* =========================================================
+   CHANGE PRODUCT NAME
+   ========================================================= */
+
+async function changeProductName(id,newName){
+
+    newName =
+        newName.trim();
+
+    if(!newName){
+
+        alert("Product name cannot be empty.");
+
+        renderRates();
+
+        return;
+
+    }
+
+
+    const product =
+        products.find(p =>
+            String(p.id) === String(id)
+        );
+
+    if(!product) return;
+
+
+    product.name =
+        newName;
+
+
+    if(supabaseClient){
+
+        const {error} =
+            await supabaseClient
+                .from("products")
+                .update({
+                    name:newName
+                })
+                .eq("id",id);
+
+        if(error){
+
+            alert(error.message);
+
+        }
+
+    }else{
+
+        saveLocalProducts();
+
+    }
+
+
+    renderRates();
+
+    renderBillingTable();
+
+}
+
+
+/* =========================================================
+   CHANGE RATE
+   ========================================================= */
+
+async function changeRate(id,newRate){
+
+    const rate =
+        Number(newRate);
+
+
+    if(isNaN(rate) || rate < 0){
+
+        alert("Enter a valid rate.");
+
+        renderRates();
+
+        return;
+
+    }
+
+
+    const product =
+        products.find(p =>
+            String(p.id) === String(id)
+        );
+
+    if(!product) return;
+
+
+    product.rate =
+        rate;
+
+
+    if(supabaseClient){
+
+        const {error} =
+            await supabaseClient
+                .from("products")
+                .update({
+                    rate:rate
+                })
+                .eq("id",id);
+
+        if(error){
+
+            alert(error.message);
+
+        }
+
+    }else{
+
+        saveLocalProducts();
+
+    }
+
+
+    renderRates();
+
+    renderBillingTable();
+
+}
+
+
+/* =========================================================
+   ADD PRODUCT
+   ========================================================= */
+
+async function addProduct(){
+
+    const name =
+        document
+            .getElementById("newProductName")
+            .value
+            .trim();
+
+    const rate =
+        Number(
+            document
+                .getElementById("newProductRate")
+                .value
+        );
+
+
+    if(!name){
+
+        alert("Enter product name.");
+
+        return;
+
+    }
+
+
+    if(isNaN(rate) || rate < 0){
+
+        alert("Enter valid rate.");
+
+        return;
+
+    }
+
+
+    if(supabaseClient){
+
+        const {data,error} =
+            await supabaseClient
+                .from("products")
+                .insert({
+                    name:name,
+                    rate:rate,
+                    qty:1,
+                    gst:false
+                })
+                .select()
+                .single();
+
+        if(error){
+
+            alert(error.message);
+
+            return;
+
+        }
+
+        products.push(data);
+
+    }else{
+
+        products.push({
+
+            id:String(Date.now()),
+
+            name:name,
+            rate:rate,
+            qty:1,
+            gst:false
+        });
+
+        saveLocalProducts();
+
+    }
+
+
+    document
+        .getElementById("newProductName")
+        .value = "";
+
+    document
+        .getElementById("newProductRate")
+        .value = "";
+
+
+    renderRates();
+
+    renderBillingTable();
+
+    alert(
+        "New product added. It is now available in Start Billing and Bill History."
+    );
+
+}
+
+
+/* =========================================================
+   DELETE PRODUCT
+   ========================================================= */
+
+async function deleteProduct(id){
+
+    const product =
+        products.find(p =>
+            String(p.id) === String(id)
+        );
+
+    if(!product) return;
+
+
+    const confirmDelete =
+        confirm(
+            `Delete "${product.name}" from the current product list?`
+        );
+
+
+    if(!confirmDelete) return;
+
+
+    if(supabaseClient){
+
+        const {error} =
+            await supabaseClient
+                .from("products")
+                .delete()
+                .eq("id",id);
+
+        if(error){
+
+            alert(error.message);
+
+            return;
+
+        }
+
+    }
+
+
+    products =
+        products.filter(p =>
+            String(p.id) !== String(id)
+        );
+
+
+    if(!supabaseClient){
+
+        saveLocalProducts();
+
+    }
+
+
+    renderRates();
+
+    renderBillingTable();
+
+}
+
+
+/* =========================================================
+   START BILLING TABLE
+   ========================================================= */
+
+function renderBillingTable(){
+
+    const productHeader =
+        document.getElementById(
+            "billingProductHeader"
+        );
+
+    const rateHeader =
+        document.getElementById(
+            "billingRateHeader"
+        );
+
+    const quantityRow =
+        document.getElementById(
+            "billingQuantityRow"
+        );
+
+    const amountRow =
+        document.getElementById(
+            "billingAmountRow"
+        );
+
+
+    productHeader.innerHTML =
+        "<th>Type</th>";
+
+    rateHeader.innerHTML =
+        "<th>Rate</th>";
+
+    quantityRow.innerHTML =
+        "<td><b>Quantity</b></td>";
+
+    amountRow.innerHTML =
+        "<th>Total Amount</th>";
+
+
+    products.forEach(product=>{
+
+        productHeader.innerHTML += `
+
+            <th class="product-header">
+                ${escapeHTML(product.name)}
+            </th>
+
+        `;
+
+
+        rateHeader.innerHTML += `
+
+            <th class="rate-row">
+                ₹${productRateWithGST(product).toFixed(2)}
+            </th>
+
+        `;
+
+
+        quantityRow.innerHTML += `
+
+            <td>
+                <input
+                    class="quantity-input billing-qty"
+                    data-product-id="${product.id}"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value="0"
+                    oninput="calculateBilling()">
+            </td>
+
+        `;
+
+
+        amountRow.innerHTML += `
+
+            <td
+                class="total-cell"
+                id="amount-${product.id}">
+                ₹0.00
+            </td>
+
+        `;
+
+    });
+
+
+    calculateBilling();
+
+}
+
+
+/* =========================================================
+   BILL CALCULATION
+   ========================================================= */
+
+function calculateBilling(){
+
+    let grandTotal = 0;
+
+
+    products.forEach(product=>{
+
+        const input =
+            document.querySelector(
+                `.billing-qty[data-product-id="${product.id}"]`
+            );
+
+
+        const qty =
+            input
+                ? Number(input.value) || 0
+                : 0;
+
+
+        const amount =
+            qty * productRateWithGST(product);
+
+
+        const amountCell =
+            document.getElementById(
+                `amount-${product.id}`
+            );
+
+
+        if(amountCell){
+
+            amountCell.textContent =
+                "₹" + amount.toFixed(2);
+
+        }
+
+
+        grandTotal += amount;
+
+    });
+
+
+    document
+        .getElementById("billingGrandTotal")
+        .textContent =
+            "₹" + grandTotal.toFixed(2);
+
+
+    return grandTotal;
+
+}
+
+
+/* =========================================================
+   GET BILL ITEMS
+   IMPORTANT:
+   EACH BILL STORES PRODUCT NAME + RATE + QUANTITY
+   ========================================================= */
+
+function getCurrentBillItems(){
+
+    const items = {};
+
+
+    products.forEach(product=>{
+
+        const input =
+            document.querySelector(
+                `.billing-qty[data-product-id="${product.id}"]`
+            );
+
+
+        const qty =
+            input
+                ? Number(input.value) || 0
+                : 0;
+
+
+        const oldItem = editingBillOriginalItems
+            ? (editingBillOriginalItems[String(product.id)] || null)
+            : null;
+        // When correcting a saved bill, keep its original price/GST snapshot.
+        // Only the entered billing quantity and line amount are recalculated.
+        const rate = oldItem && typeof oldItem === "object" ? Number(oldItem.rate ?? product.rate) : Number(product.rate);
+        const productQty = oldItem && typeof oldItem === "object" ? Number(oldItem.qty ?? product.qty ?? 1) : Number(product.qty ?? 1);
+        const finalRate = oldItem && typeof oldItem === "object" ? Number(oldItem.finalRate ?? (rate * productQty)) : productFinalRate(product);
+        const gst = oldItem && typeof oldItem === "object" ? !!oldItem.gst : !!product.gst;
+        const gstPerUnit = oldItem && typeof oldItem === "object" ? Number(oldItem.gstPerUnit ?? (gst ? finalRate * 0.05 : 0)) : productGSTPerUnit(product);
+        const rateWithGST = oldItem && typeof oldItem === "object" ? Number(oldItem.rateWithGST ?? (finalRate + gstPerUnit)) : productRateWithGST(product);
+        items[String(product.id)] = {
+            product_id:String(product.id),
+            name:oldItem && oldItem.name ? oldItem.name : product.name,
+            rate, qty:productQty, gst, finalRate, gstPerUnit, rateWithGST,
+            quantity:qty,
+            lineAmount:qty * rateWithGST
+        };
+
+    });
+
+
+    return items;
+
+}
+
+
+/* =========================================================
+   SAVE BILL
+   ========================================================= */
+
+async function saveBilling(){
+
+    const billDate =
+        document
+            .getElementById("billingDate")
+            .value;
+
+
+    const session =
+        document
+            .getElementById("billingSession")
+            .value;
+
+
+    if(!billDate){
+
+        alert("Select billing date.");
+
+        return;
+
+    }
+
+
+    const items =
+        getCurrentBillItems();
+
+
+    let total = 0;
+
+
+    Object.values(items).forEach(item=>{
+
+        total += itemAmount(item);
+
+    });
+
+
+    const bill = {
+
+        bill_date:billDate,
+
+        session:session,
+
+        items:items,
+
+        total_amount:total
+
+    };
+
+
+    if(supabaseClient){
+
+        const {error} =
+            await supabaseClient
+                .from("bills")
+                .upsert(
+                    bill,
+                    {
+                        onConflict:"bill_date,session"
+                    }
+                );
+
+
+        if(error){
+
+            alert(error.message);
+
+            console.error(error);
+
+            return;
+
+        }
+
+    }else{
+
+        const existingIndex =
+            bills.findIndex(b =>
+                b.bill_date === billDate &&
+                b.session === session
+            );
+
+
+        if(existingIndex >= 0){
+
+            bills[existingIndex] = {
+
+                ...bills[existingIndex],
+
+                ...bill
+
+            };
+
+        }else{
+
+            bills.push({
+
+                id:String(Date.now()),
+
+                ...bill
+
+            });
+
+        }
+
+
+        localStorage.setItem(
+            "nandini_bills",
+            JSON.stringify(bills)
+        );
+
+    }
+
+
+    editingBillOriginalItems = null;
+    await loadBills();
+
+    const asdValue = document.getElementById("dailyASDValue");
+    if(asdValue) asdValue.textContent = "₹" + dailyASD(billDate).toFixed(2);
+    if(document.getElementById("dashboardDate")?.value === billDate){
+        document.getElementById("dashDailyASD").textContent = "₹" + dailyASD(billDate).toFixed(2);
+        document.getElementById("dashMonthlyASD").textContent = "₹" + monthlyASD(billDate.slice(0,7)).toFixed(2);
+    }
+
+    document
+        .getElementById("billingStatus")
+        .textContent =
+            `Saved ${session} bill for ${billDate}. Total ₹${total.toFixed(2)}`;
+
+    alert(
+        "Bill saved successfully.\n\nThe saved rates will remain unchanged even if you change the rates later."
+    );
+
+}
+
+
+/* =========================================================
+   LOAD BILL
+   ========================================================= */
+
+async function loadBilling(){
+
+    await loadBills();
+
+    const billDate =
+        document
+            .getElementById("billingDate")
+            .value;
+
+    const session =
+        document
+            .getElementById("billingSession")
+            .value;
+
+
+    const bill =
+        bills.find(b =>
+            b.bill_date === billDate &&
+            b.session === session
+        );
+
+
+    document
+        .querySelectorAll(".billing-qty")
+        .forEach(input=>{
+
+            input.value = 0;
+
+        });
+
+
+    if(!bill){
+
+        editingBillOriginalItems = null;
+        calculateBilling();
+
+        document
+            .getElementById("billingStatus")
+            .textContent =
+                "No saved bill found for this date and session.";
+
+        return;
+
+    }
+
+
+    /* Keep original prices/GST when this saved bill is being corrected. */
+    editingBillOriginalItems = bill.items || bill.quantities || {};
+
+    const items =
+        bill.items || bill.quantities || {};
+
+
+    Object.keys(items).forEach(productId=>{
+
+        const item =
+            items[productId];
+
+
+        const input =
+            document.querySelector(
+                `.billing-qty[data-product-id="${productId}"]`
+            );
+
+
+        if(input){
+
+            input.value =
+                item.quantity !== undefined
+                    ? item.quantity
+                    : item;
+
+        }
+
+    });
+
+
+    calculateBilling();
+
+
+    document
+        .getElementById("billingStatus")
+        .textContent =
+            `Loaded saved ${session} bill for ${billDate}.`;
+
+}
+
+
+/* =========================================================
+   CLEAR BILL
+   ========================================================= */
+
+function clearBilling(){
+
+    document
+        .querySelectorAll(".billing-qty")
+        .forEach(input=>{
+
+            input.value = 0;
+
+        });
+
+
+    calculateBilling();
+
+
+    document
+        .getElementById("billingStatus")
+        .textContent =
+            "Billing quantities cleared.";
+
+}
+
+
+/* =========================================================
+   PREVIEW BILL
+   ========================================================= */
+
+function previewBilling(){
+
+    const date =
+        document
+            .getElementById("billingDate")
+            .value;
+
+    const session =
+        document
+            .getElementById("billingSession")
+            .value;
+
+
+    const items =
+        getCurrentBillItems();
+
+
+    let total = 0;
+
+
+    let html = `
+
+        <p>
+            <b>Date:</b> ${date}
+            &nbsp;&nbsp;
+            <b>Session:</b> ${session}
+        </p>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Product</th>
+
+                    <th>Rate</th>
+                    <th>QTY Multiplier</th>
+                    <th>Final Rate</th>
+                    <th>GST Yes/No</th>
+                    <th>GST per Unit</th>
+                    <th>Billing Quantity</th>
+                    <th>Line Amount</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+    `;
+
+
+    Object.values(items).forEach(item=>{
+
+        if(item.quantity > 0){
+
+            const finalRate = Number(item.finalRate ?? item.rate);
+            const gstPerUnit = Number(item.gstPerUnit ?? 0);
+            const amount = itemAmount(item);
+            total += amount;
+
+
+            html += `
+
+                <tr>
+
+                    <td>
+                        ${escapeHTML(item.name)}
+                    </td>
+
+                    <td>₹${Number(item.rate).toFixed(2)}</td>
+                    <td>${Number(item.qty ?? 1)}</td>
+                    <td>₹${finalRate.toFixed(2)}</td>
+                    <td>${item.gst ? "Yes" : "No"}</td>
+                    <td>₹${gstPerUnit.toFixed(2)}</td>
+                    <td>${item.quantity}</td>
+                    <td>₹${amount.toFixed(2)}</td>
+
+                </tr>
+
+            `;
+
+        }
+
+    });
+
+
+    html += `
+
+            </tbody>
+
+            <tfoot>
+
+                <tr>
+
+                    <th colspan="6">
+                        Total
+                    </th>
+
+                    <th>
+                        ₹${total.toFixed(2)}
+                    </th>
+
+                </tr>
+
+            </tfoot>
+
+        </table>
+
+    `;
+
+
+    document
+        .getElementById("previewDetails")
+        .innerHTML = html;
+
+
+    document
+        .getElementById("billingPreview")
+        .style.display = "block";
+
+
+    document
+        .getElementById("billingPreview")
+        .scrollIntoView({
+            behavior:"smooth"
+        });
+
+}
+
+
+/* =========================================================
+   CLOSE PREVIEW
+   ========================================================= */
+
+function closePreview(){
+
+    document
+        .getElementById("billingPreview")
+        .style.display = "none";
+
+}
+
+
+/* =========================================================
+   PRINT BILLING PREVIEW
+   ========================================================= */
+
+function printBillingPreview(){
+
+    const preview =
+        document
+            .getElementById("billingPreview");
+
+
+    const oldDisplay =
+        preview.style.display;
+
+
+    preview.style.display =
+        "block";
+
+
+    window.print();
+
+
+    preview.style.display =
+        oldDisplay;
+
+}
+
+
+/* =========================================================
+   LOAD BILLS
+   ========================================================= */
+
+async function loadBills(){
+
+    if(!supabaseClient){
+
+        const saved =
+            localStorage.getItem("nandini_bills");
+
+        bills =
+            saved
+                ? JSON.parse(saved)
+                : [];
+
+        return;
+
+    }
+
+
+    const {data,error} =
+        await supabaseClient
+            .from("bills")
+            .select("*")
+            .order("bill_date",{ascending:true});
+
+
+    if(error){
+
+        console.error(error);
+
+        return;
+
+    }
+
+
+    bills =
+        data || [];
+
+}
+
+
+/* =========================================================
+   HISTORY
+   ========================================================= */
+
+async function showHistory(){
+
+    await loadProducts();
+
+    await loadBills();
+
+
+    const selectedDate =
+        document
+            .getElementById("historyDate")
+            .value;
+
+
+    const selectedMonth =
+        document
+            .getElementById("historyMonth")
+            .value;
+
+
+    const session =
+        document
+            .getElementById("historySession")
+            .value;
+
+
+    if(selectedDate){
+
+        renderHistoryForDate(
+            selectedDate,
+            session
+        );
+
+    }else{
+
+        renderHistoryForMonth(
+            selectedMonth,
+            session
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   GET SAVED ITEM
+   ========================================================= */
+
+function getSavedItem(bill,productId){
+
+    if(!bill) return null;
+
+
+    const items =
+        bill.items || bill.quantities || {};
+
+
+    return items[String(productId)] || null;
+
+}
+
+
+/* =========================================================
+   HISTORY FOR DATE
+   ========================================================= */
+
+function renderHistoryForDate(
+    date,
+    session
+){
+
+    if(session === "Combined"){
+
+        renderCombinedForDate(date);
+
+    }else{
+
+        const bill =
+            bills.find(b =>
+                b.bill_date === date &&
+                b.session === session
+            );
+
+
+        renderHistoryRows([bill],date,session);
+
+    }
+
+}
+
+
+/* =========================================================
+   HISTORY FOR MONTH
+   ========================================================= */
+
+function renderHistoryForMonth(
+    month,
+    session
+){
+
+    const monthBills =
+        bills.filter(b =>
+            b.bill_date.startsWith(month)
+        );
+
+
+    if(session === "Combined"){
+
+        renderCombinedForMonth(
+            month,
+            monthBills
+        );
+
+    }else{
+
+        const filtered =
+            monthBills.filter(b =>
+                b.session === session
+            );
+
+
+        renderHistoryRows(
+            filtered,
+            month,
+            session
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   NORMAL HISTORY TABLE
+   PRODUCTS ARE COLUMNS
+   ========================================================= */
+
+function renderHistoryRows(
+    selectedBills,
+    title,
+    session
+){
+
+    const header =
+        document.getElementById(
+            "historyHeader"
+        );
+
+    const body =
+        document.getElementById(
+            "historyBody"
+        );
+
+    const footer =
+        document.getElementById(
+            "historyFooter"
+        );
+
+
+    header.innerHTML =
+        "<th>Date</th>";
+
+
+    products.forEach(product=>{
+
+        header.innerHTML += `
+
+            <th>
+                ${escapeHTML(product.name)}
+            </th>
+
+        `;
+
+    });
+
+
+    header.innerHTML += `
+        <th>Total Amount</th>
+        <th class="no-print">Actions</th>
+    `;
+
+
+    body.innerHTML = "";
+
+
+    let grandTotal = 0;
+
+
+    const quantityTotals = {};
+
+
+    products.forEach(p=>{
+        quantityTotals[p.id] = 0;
+    });
+
+
+    selectedBills.forEach(bill=>{
+
+        if(!bill) return;
+
+
+        const tr =
+            document.createElement("tr");
+
+
+        tr.innerHTML =
+            `<td>${bill.bill_date}</td>`;
+
+
+        let rowTotal = 0;
+
+
+        products.forEach(product=>{
+
+            const item =
+                getSavedItem(
+                    bill,
+                    product.id
+                );
+
+
+            let qty = 0;
+            let rate = product.rate;
+
+
+            if(item){
+
+                if(typeof item === "object"){
+
+                    qty =
+                        Number(item.quantity) || 0;
+
+                    /*
+                       IMPORTANT:
+                       Historical rate comes from
+                       the saved bill.
+                    */
+
+                    rate =
+                        Number(item.rate);
+
+                }else{
+
+                    qty =
+                        Number(item) || 0;
+
+                }
+
+            }
+
+
+            const amount = item && typeof item === "object" ? itemAmount(item) : qty * rate;
+
+
+            quantityTotals[product.id] += qty;
+
+            rowTotal += amount;
+
+
+            tr.innerHTML += `
+
+                <td>
+
+                    ${qty}
+
+                    <br>
+
+                    <small>
+                        ₹${(item && typeof item === "object" ? Number(item.finalRate ?? rate) : rate).toFixed(2)}
+                        ${item && typeof item === "object" && Number(item.gstPerUnit || 0)>0 ? `<br>+ GST ₹${Number(item.gstPerUnit).toFixed(2)}` : ""}
+                    </small>
+
+                </td>
+
+            `;
+
+        });
+
+
+        grandTotal += rowTotal;
+
+
+        tr.innerHTML += `
+            <td class="total-cell">₹${rowTotal.toFixed(2)}</td>
+            <td class="no-print history-actions">
+                <button class="btn primary" onclick="editSavedBill('${bill.bill_date}','${bill.session}')">Edit / Correct</button>
+                <button class="btn danger" onclick="deleteSavedBill('${bill.bill_date}','${bill.session}')">Delete</button>
+            </td>
+        `;
+
+        body.appendChild(tr);
+
+    });
+
+
+    footer.innerHTML =
+        `<th>Total Qty</th>`;
+
+
+    products.forEach(product=>{
+
+        footer.innerHTML += `
+
+            <th>
+                ${quantityTotals[product.id]}
+            </th>
+
+        `;
+
+    });
+
+
+    footer.innerHTML += `
+        <th>₹${grandTotal.toFixed(2)}</th>
+        <th class="no-print"></th>
+    `;
+
+
+    document
+        .getElementById("historyGrandTotal")
+        .textContent =
+            "₹" + grandTotal.toFixed(2);
+
+
+    const monthForASD = String(title).match(/\\d{4}-\\d{2}/)?.[0] || currentMonth();
+    document.getElementById("historyMonthlyASD").textContent = "₹" + monthlyASD(monthForASD).toFixed(2);
+    document
+        .getElementById("historyTitle")
+        .textContent =
+            `Nandini Bill History - ${title} - ${session}`;
+
+}
+
+
+/* =========================================================
+   COMBINED DATE
+   ========================================================= */
+
+function renderCombinedForDate(date){
+
+    const morning =
+        bills.find(b =>
+            b.bill_date === date &&
+            b.session === "Morning"
+        );
+
+
+    const afternoon =
+        bills.find(b =>
+            b.bill_date === date &&
+            b.session === "Afternoon"
+        );
+
+
+    renderCombinedBills(
+        [
+            {
+                date:date,
+
+                morning:morning,
+
+                afternoon:afternoon
+            }
+        ],
+        `Combined - ${date}`
+    );
+
+}
+
+
+/* =========================================================
+   COMBINED MONTH
+   ========================================================= */
+
+function renderCombinedForMonth(
+    month,
+    monthBills
+){
+
+    const dates =
+        [
+            ...new Set(
+                monthBills.map(
+                    b => b.bill_date
+                )
+            )
+        ]
+        .sort();
+
+
+    const rows = [];
+
+
+    dates.forEach(date=>{
+
+        rows.push({
+
+            date:date,
+
+            morning:
+                monthBills.find(b =>
+                    b.bill_date === date &&
+                    b.session === "Morning"
+                ),
+
+            afternoon:
+                monthBills.find(b =>
+                    b.bill_date === date &&
+                    b.session === "Afternoon"
+                )
+
+        });
+
+    });
+
+
+    renderCombinedBills(
+        rows,
+        `Combined - ${month}`
+    );
+
+}
+
+
+/* =========================================================
+   COMBINED BILL TABLE
+   ========================================================= */
+
+function renderCombinedBills(
+    rows,
+    title
+){
+
+    const header =
+        document.getElementById(
+            "historyHeader"
+        );
+
+    const body =
+        document.getElementById(
+            "historyBody"
+        );
+
+    const footer =
+        document.getElementById(
+            "historyFooter"
+        );
+
+
+    header.innerHTML =
+        "<th>Date</th>";
+
+
+    products.forEach(product=>{
+
+        header.innerHTML += `
+
+            <th>
+                ${escapeHTML(product.name)}
+            </th>
+
+        `;
+
+    });
+
+
+    header.innerHTML +=
+        "<th>Total Amount</th><th class=\"no-print\">Actions</th>";
+
+
+    body.innerHTML = "";
+
+
+    const quantityTotals = {};
+
+
+    products.forEach(p=>{
+        quantityTotals[p.id] = 0;
+    });
+
+
+    let grandTotal = 0;
+
+
+    rows.forEach(row=>{
+
+        const tr =
+            document.createElement("tr");
+
+
+        tr.innerHTML =
+            `<td>${row.date}</td>`;
+
+
+        let rowTotal = 0;
+
+
+        products.forEach(product=>{
+
+            const morningItem =
+                getSavedItem(
+                    row.morning,
+                    product.id
+                );
+
+
+            const afternoonItem =
+                getSavedItem(
+                    row.afternoon,
+                    product.id
+                );
+
+
+            let morningQty = 0;
+            let afternoonQty = 0;
+
+
+            if(morningItem){
+
+                morningQty =
+                    typeof morningItem === "object"
+                        ? Number(morningItem.quantity) || 0
+                        : Number(morningItem) || 0;
+
+            }
+
+
+            if(afternoonItem){
+
+                afternoonQty =
+                    typeof afternoonItem === "object"
+                        ? Number(afternoonItem.quantity) || 0
+                        : Number(afternoonItem) || 0;
+
+            }
+
+
+            const combinedQty =
+                morningQty +
+                afternoonQty;
+
+
+            /*
+               Each session has its own saved rate.
+               If the rates differ between sessions,
+               calculate each quantity using its
+               respective saved rate.
+            */
+
+            let morningRate = productRateWithGST(product);
+            let afternoonRate = productRateWithGST(product);
+
+
+            if(
+                morningItem &&
+                typeof morningItem === "object" &&
+                morningItem.rate !== undefined
+            ){
+
+                morningRate = Number(morningItem.rateWithGST ??
+                    (Number(morningItem.finalRate ?? morningItem.rate) + Number(morningItem.gstPerUnit ?? 0)));
+
+            }
+
+
+            if(
+                afternoonItem &&
+                typeof afternoonItem === "object" &&
+                afternoonItem.rate !== undefined
+            ){
+
+                afternoonRate = Number(afternoonItem.rateWithGST ??
+                    (Number(afternoonItem.finalRate ?? afternoonItem.rate) + Number(afternoonItem.gstPerUnit ?? 0)));
+
+            }
+
+
+            const amount =
+                (morningQty * morningRate) +
+                (afternoonQty * afternoonRate);
+
+
+            quantityTotals[product.id] +=
+                combinedQty;
+
+
+            rowTotal += amount;
+
+
+            tr.innerHTML += `
+
+                <td>
+
+                    ${combinedQty}
+
+                </td>
+
+            `;
+
+        });
+
+
+        grandTotal += rowTotal;
+
+
+        tr.innerHTML += `
+            <td class="total-cell">₹${rowTotal.toFixed(2)}</td>
+            <td class="no-print history-actions">
+                <div><strong>Morning</strong> ${row.morning ? `<button class="btn primary" onclick="editSavedBill('${row.date}','Morning')">Edit</button> <button class="btn danger" onclick="deleteSavedBill('${row.date}','Morning')">Delete</button>` : '<small>Not saved</small>'}</div>
+                <div><strong>Afternoon</strong> ${row.afternoon ? `<button class="btn primary" onclick="editSavedBill('${row.date}','Afternoon')">Edit</button> <button class="btn danger" onclick="deleteSavedBill('${row.date}','Afternoon')">Delete</button>` : '<small>Not saved</small>'}</div>
+            </td>
+        `;
+
+        body.appendChild(tr);
+
+    });
+
+
+    footer.innerHTML =
+        "<th>Total Qty</th>";
+
+
+    products.forEach(product=>{
+
+        footer.innerHTML += `
+
+            <th>
+                ${quantityTotals[product.id]}
+            </th>
+
+        `;
+
+    });
+
+
+    footer.innerHTML += `
+        <th>₹${grandTotal.toFixed(2)}</th>
+        <th class="no-print"></th>
+    `;
+
+
+    document
+        .getElementById("historyGrandTotal")
+        .textContent =
+            "₹" + grandTotal.toFixed(2);
+
+
+    const monthForASD = String(title).match(/\\d{4}-\\d{2}/)?.[0] || currentMonth();
+    document.getElementById("historyMonthlyASD").textContent = "₹" + monthlyASD(monthForASD).toFixed(2);
+    document
+        .getElementById("historyTitle")
+        .textContent =
+            `Nandini Bill History - ${title}`;
+
+}
+
+
+/* =========================================================
+   EDIT / DELETE SAVED BILL
+   ========================================================= */
+async function editSavedBill(date, session){
+    document.getElementById("billingDate").value = date;
+    document.getElementById("billingSession").value = session;
+    showPage("billing");
+    await loadBilling();
+    document.getElementById("billingStatus").textContent = `Correcting saved ${session} bill for ${date}. Change quantities and press Save Bill to update Bill History.`;
+    window.scrollTo({top:0, behavior:"smooth"});
+}
+
+async function deleteSavedBill(date, session){
+    const ok = confirm(`Delete the ${session} bill for ${date}? This cannot be undone. The other session's bill will not be deleted.`);
+    if(!ok) return;
+    if(supabaseClient){
+        const {error} = await supabaseClient.from("bills").delete().eq("bill_date", date).eq("session", session);
+        if(error){ alert("Could not delete bill: " + error.message); console.error(error); return; }
+    }else{
+        bills = bills.filter(b => !(b.bill_date === date && b.session === session));
+        localStorage.setItem("nandini_bills", JSON.stringify(bills));
+    }
+    editingBillOriginalItems = null;
+    await loadBills();
+    await showHistory();
+    alert(`${session} bill for ${date} deleted.`);
+}
+
+/* =========================================================
+   PRINT HISTORY
+   ========================================================= */
+
+function printHistory(){
+
+    window.print();
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+
+async function loadDashboard(){
+
+    await loadBills();
+
+
+    const date =
+        document
+            .getElementById("dashboardDate")
+            .value;
+
+
+    const morning =
+        bills.find(b =>
+            b.bill_date === date &&
+            b.session === "Morning"
+        );
+
+
+    const afternoon =
+        bills.find(b =>
+            b.bill_date === date &&
+            b.session === "Afternoon"
+        );
+
+
+    let morningQty = 0;
+    let morningAmount = 0;
+
+    let afternoonQty = 0;
+    let afternoonAmount = 0;
+
+
+    if(morning){
+
+        const result =
+            calculateSavedBill(morning);
+
+        morningQty =
+            result.quantity;
+
+        morningAmount =
+            result.amount;
+
+    }
+
+
+    if(afternoon){
+
+        const result =
+            calculateSavedBill(afternoon);
+
+        afternoonQty =
+            result.quantity;
+
+        afternoonAmount =
+            result.amount;
+
+    }
+
+
+    document
+        .getElementById("dashMorningQty")
+        .textContent =
+            morningQty;
+
+
+    document
+        .getElementById("dashMorningAmount")
+        .textContent =
+            "₹" + morningAmount.toFixed(2);
+
+
+    document
+        .getElementById("dashAfternoonQty")
+        .textContent =
+            afternoonQty;
+
+
+    document
+        .getElementById("dashAfternoonAmount")
+        .textContent =
+            "₹" + afternoonAmount.toFixed(2);
+
+
+    document
+        .getElementById("dashCombinedAmount")
+        .textContent =
+            "₹" +
+            (
+                morningAmount +
+                afternoonAmount
+            ).toFixed(2);
+
+    document.getElementById("dashDailyASD").textContent = "₹" + dailyASD(date).toFixed(2);
+    document.getElementById("dashMonthlyASD").textContent = "₹" + monthlyASD(date ? date.slice(0,7) : currentMonth()).toFixed(2);
+
+}
+
+
+/* =========================================================
+   CALCULATE SAVED BILL
+   USES SAVED RATE
+   ========================================================= */
+
+function calculateSavedBill(bill){
+
+    const items =
+        bill.items || bill.quantities || {};
+
+
+    let quantity = 0;
+
+    let amount = 0;
+
+
+    Object.values(items).forEach(item=>{
+
+        let qty = 0;
+        let rate = 0;
+
+
+        if(typeof item === "object"){
+
+            qty =
+                Number(item.quantity) || 0;
+
+            rate = Number(item.rateWithGST ??
+                (Number(item.finalRate ?? item.rate) + Number(item.gstPerUnit ?? 0))) || 0;
+
+        }else{
+
+            qty =
+                Number(item) || 0;
+
+            rate = 0;
+
+        }
+
+
+        quantity += qty;
+
+        amount +=
+            qty * rate;
+
+    });
+
+
+    /*
+       Old bills created by a previous version
+       may not have saved rates.
+       Fallback to current product rate.
+    */
+
+    if(amount === 0){
+
+        Object.entries(items)
+            .forEach(([id,item])=>{
+
+                if(typeof item !== "object"){
+
+                    const product =
+                        products.find(p =>
+                            String(p.id) === String(id)
+                        );
+
+
+                    if(product){
+
+                        amount +=
+                            Number(item) *
+                            productRateWithGST(product);
+
+                    }
+
+                }
+
+            });
+
+    }
+
+
+    return {
+        quantity,
+        amount
+    };
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+   ========================================================= */
+
+function escapeHTML(value){
+
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================================
+   DATE CHANGE
+   ========================================================= */
+
+document
+    .getElementById("billingDate")
+    .addEventListener(
+        "change",
+        loadBilling
+    );
+
+
+document
+    .getElementById("billingSession")
+    .addEventListener(
+        "change",
+        loadBilling
+    );
+
+
+document
+    .getElementById("dashboardDate")
+    .addEventListener(
+        "change",
+        loadDashboard
+    );
+
+
+/* =========================================================
+   START APP
+   ========================================================= */
+
+initialize();
+
+</script>
+
+</body>
+</html>
